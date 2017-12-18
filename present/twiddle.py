@@ -1,5 +1,6 @@
-import time
+import os
 import sys
+import time
 
 def twiddle(secs):
     len_sleep = 0.1
@@ -13,6 +14,4 @@ def twiddle(secs):
         sys.stdout.write('\x08')
     print()
 
-print("cd drive activated...")
 twiddle(3)
-
