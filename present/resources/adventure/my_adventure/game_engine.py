@@ -34,10 +34,12 @@ delete_action = make_owned_thing_helpers("actions")
 #===================
 
 class Thingy(object):
-    def __init__(self, name, hotkey, desc, room_actions=[], player_actions=[]):
+    def __init__(self, 
+                 name, hotkey, 
+                 grab_action, drop_action,
+                 room_actions=[], player_actions=[]):
         self.name = name
         self.hotkey = hotkey
-        self.desc = desc
         self.room_actions = room_actions
         self.player_actions = player_actions
 
@@ -48,6 +50,7 @@ class Thingy(object):
 
         @Action(grab_name, grab_hotkey)
         def grab(player, room):
+            grab_action(player, room)
             register_action(player, drop)
             for action in player_actions:
                 register_action(player, action)
@@ -58,6 +61,7 @@ class Thingy(object):
 
         @Action(drop_name, drop_hotkey)
         def drop(player, room):
+            drop_action(player, room)
             register_action(player, grab)
             for action in room_actions:
                 register_action(room, action)
@@ -107,6 +111,11 @@ def onetime(fun):
             used=True
     return onetime_fun
 
+def make_print_action(phrase):
+    def action(player, room):
+        print(phrase)
+    return action
+
 #===================
 
 class Room(object):
@@ -126,7 +135,7 @@ class Room(object):
         self.room_action(player)
 
 def link_rooms(room1, room2, passage_phrase, hotkey_pair, action_phrase):
-    def make_action(newRoom, hotkey):
+    def make_link_action(newRoom, hotkey):
         @Action("{}, {}".format(passage_phrase, newRoom.short_desc), hotkey)
         def action(player, room):
             print("""
@@ -134,8 +143,8 @@ def link_rooms(room1, room2, passage_phrase, hotkey_pair, action_phrase):
             player.room = newRoom
         return action
     a, b = hotkey_pair
-    register_action(room1, make_action(room2, a))
-    register_action(room2, make_action(room1, b))
+    register_action(room1, make_link_action(room2, a))
+    register_action(room2, make_link_action(room1, b))
 
 #===================
 

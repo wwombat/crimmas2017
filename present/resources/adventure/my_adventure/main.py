@@ -8,7 +8,6 @@ import time
 def game_eval(player, room, world):
     room.act(player)
     world.act(player)
-    time.sleep(0.5)
     actions = []
     for thing in [room, player, world]:
         actions += list(thing.actions.values())
@@ -26,7 +25,6 @@ def play(player, world, chooser):
     while not player.victory:
         room = player.room
         print(str(room))
-        time.sleep(0.5)
         actions = game_eval(player, room, world)
         print()
         print(str(player))

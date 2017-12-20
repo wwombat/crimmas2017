@@ -4,26 +4,65 @@ import time
 foyer = Room("Foyer", """
         You find yourself in a cozy cave lit by a crackling hearth.
         A pile of neatly stacked potatoes rests in the corner, and
-        three pairs of coats and scarves are hung up on the wall.
+        two pairs of coats and scarves are hung up on the wall.
         """,
         "you see the warm glow of a hearth...",
         make_stat_incrementer("coziness", 2))
+
+@Action("Put on scarf and coat", "p sc")
+def put_on_scarf_and_coat(player, room):
+    print("""
+        You put on your favorite fuzzy scarf and your
+        quilted coat""")
+    increment_stat(player, "coziness", 3)
+    increment_stat(player, "warmth", 10)
+
+@Action("Take off scarf and coat", "p sc")
+def take_off_scarf_and_coat(player, room):
+    print("""
+        You take off your scarf and coat and lay them
+        gently on the ground.
+        """)
+    increment_stat(player, "coziness", -3)
+    increment_stat(player, "warmth", -10)
+
+scarf_and_coat = Thingy("scarf and coat", "sc",
+        put_on_scarf_and_coat,
+        take_off_scarf_and_coat,
+        [],
+        [])
+register_action(foyer, scarf_and_coat.grab)
 
 library = Room("Library", """
         You are in a tiny room entirely filled with books.
 
         Kai is nestled in a big, plush armchair in the corner,
         wrapped in a big fuzzy blanket and snoring softly.
-        He has a copy of "The Rabbi's Cat" open on his lap.
         """,
         "you hear the sound of gentle snoring...",
         make_stat_incrementer("coziness", 5));
 
+@Action("Read book", "rb")
+def read_book(player, room):
+    import books
+    book = books.get_random()
+    book(player, room)
+register_action(library, read_book)
+
+@Action("Poke Kai", "pk")
+def poke_kai(player, room):
+    print("""
+        You poke kai, and he wrinkled his nose in his sleep,
+        murmurs something about potatos, and then burrows deeper 
+        into his blanket...""")
+    increment_stat(player, "coziness", 1)
+    delete_action(poke_kai)
+register_action(library, poke_kai) 
+
 den = Room("Den", """
         A long, low-ceilinged hall stretches in front of you,
         covered in carefully-applied wallpaper featuring illustrations
-        of some sort of North African city (terraced buildings, sunlight,
-        the sea...)
+        of a North African city.
 
         Paper lanterns hanging from the ceiling shed a gentle
         golden-red glow everywhere.
@@ -31,23 +70,54 @@ den = Room("Den", """
         "you see a soft red glow...",
         make_stat_incrementer("coziness", 1));
 
+@Action("Look at wall paper", "lw")
+def look_at_wallpaper(player, room):
+    print("""
+        It's a drawing of a fishing town. 
+        You see terraced buildings... sunlight... the sea...""")
+    increment_stat("coziness", 1)
+    increment_stat("wistfulness", 1)
+    delete_action(look_at_wallpaper)
+register_action(den, look_at_wallpaper)
+
+def grab_lantern(player, room):
+    print("""
+        You carefully grab one of the paper lanterns.
+        Its glow makes you feel cozy.""")
+    increment_stat(player, "coziness", 1)
+    increment_stat(player, "light", 1)
+    increment_stat(room, "light", -1)
+
+def drop_lantern(player, room):
+    print("""
+        You set the lantern to the side.
+        """)
+    decrement_stat(player, "coziness", 1)
+    increment_stat(player, "light", -1)
+    increment_stat(room, "light", 1)
+
+lantern = Thingy("lantern", "l",
+        grab_lantern,
+        drop_lantern,
+        [],
+        [])
+register_action(den, lantern.grab)
+
 tower = Room("The Tower", """
-        You are in a small garden at the top of a steep tower.
+        You are in a small garden at the top of a tower.
 
         The entire garden is cloaked in snow- stone beasts sit,
         stoic, beneath coats of snow, next to bare-limbed trees.
-        Flakes of snow slowly drift down from the flat, bone-white
-        sky.
+        Flakes of snow slowly drift down from the flat white sky.
 
         A chest-height wall rings the tower's top, and looking out,
-        you can a vast landscape of snow, great pine trees burned with
-        stretching away until they recede into blankness.
+        you can see a snowy forest stretching into the distance.
 
-        In the summer, you think the garden must be truly lovely-
-        you see a trellis where morning glories glow and open their
-        faerie-blue trumpets, and a cluster of ornamental figs (now
-        tightly wrapped in blankets) huddled around a stone bench in
-        the shape of a turtle.
+        In the summer, you think the garden must be truly beautiful-
+        you see a trellis where you remembered that morning glories 
+        would grow and open their faerie-blue trumpets, and a cluster 
+        of ornamental figs (now tightly wrapped in blankets) huddled 
+        around a stone bench in the shape of a turtle.
         """,
         "you feel a cold wind blowing...",
         seq([make_stat_incrementer("coziness", -3),
@@ -61,13 +131,11 @@ kitchen = Room("Kitchen", """
         "a delicious scent wafts...",
         make_stat_incrementer("coziness", 2))
 
-
 @Action("Smell", "s")
 def smell(player, room):
     print("""
-        Smells like cookies ~^~""")
+        Smells like crimmas ~^~""")
     increment_stat(player, "coziness", 1)
-    time.sleep(1)
 register_action(kitchen, smell)
 
 @Action("Eat cookies", "eat")
@@ -77,12 +145,12 @@ def eat(player, room):
     increment_stat(player, "coziness", 1)
     increment_stat(player, "satiety", 1)
     cookies.delete()
-    time.sleep(1)
 
-cookies = Thingy("cookies", "cookies",
-        """
-        Delicious chocolate chip cookies, straight from the oven.
-        """,
+cookies = Thingy("cookies", "c",
+        make_print_action("""
+        You nab some delicious cookies."""),
+        make_print_action("""
+        You gently lay the sweet cookies down."""),
         [],
         [eat])
 register_action(kitchen, cookies.grab)
@@ -108,15 +176,14 @@ class OneTimeConditionalAction(object):
     def register(self, obj):
         register_action(obj, self.action)
     def check(self, player):
-        print("checking...")
         if self.condition(player):
             self.register(player)
 
 @Action("Apotheosize", "ap")
 def apotheosis_action(player, room):
     print("""
-        A golden light wreathes you, and your vision blurs
-        you feel a tremendous energy coursing through you-
+        A golden light wreathes you, and your vision blurs.
+        You feel a tremendous energy coursing through you-
         the power of COZINESS!!!
 
         Your coziness levels reached such a high level
