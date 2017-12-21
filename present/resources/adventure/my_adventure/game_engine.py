@@ -180,7 +180,7 @@ class Player(object):
         self.stats = {}
         self.victory = False #for now (growth mindset)
         self.appearance ="""
-        You are wearing a festive sweater, sparkling with tinsel.
+        You are wearing a festive sweater sparkling with tinsel.
         You feel real cozy!!!
         """
         @Action("Look at self", "ls")
