@@ -4,7 +4,7 @@ import time
 foyer = Room("Foyer", """
         You find yourself in a cozy cave lit by a crackling hearth.
         A pile of neatly stacked potatoes rests in the corner, and
-        two pairs of coats and scarves are hung up on the wall.
+        two pairs of coats and scarves hang from hooks on the wall.
         """,
         "you see the warm glow of a hearth...",
         make_stat_incrementer("coziness", 2))
@@ -52,9 +52,8 @@ register_action(library, read_book)
 @Action("Poke Kai", "pk")
 def poke_kai(player, room):
     print("""
-        You poke kai, and he wrinkled his nose in his sleep,
-        murmurs something about potatos, and then burrows deeper 
-        into his blanket...""")
+        He  wrinkles his nose in his sleep, murmurs something about 
+        potatoes, and then burrows deeper into his blanket...""")
     increment_stat(player, "coziness", 1)
     delete_action(poke_kai)
 register_action(library, poke_kai) 
@@ -75,8 +74,8 @@ def look_at_wallpaper(player, room):
     print("""
         It's a drawing of a fishing town. 
         You see terraced buildings... sunlight... the sea...""")
-    increment_stat("coziness", 1)
-    increment_stat("wistfulness", 1)
+    increment_stat(player, "coziness", 1)
+    increment_stat(player, "wistfulness", 1)
     delete_action(look_at_wallpaper)
 register_action(den, look_at_wallpaper)
 
@@ -86,15 +85,15 @@ def grab_lantern(player, room):
         Its glow makes you feel cozy.""")
     increment_stat(player, "coziness", 1)
     increment_stat(player, "light", 1)
-    increment_stat(room, "light", -1)
+    #increment_stat(room, "light", -1)
 
 def drop_lantern(player, room):
     print("""
         You set the lantern to the side.
         """)
-    decrement_stat(player, "coziness", 1)
+    increment_stat(player, "coziness", -1)
     increment_stat(player, "light", -1)
-    increment_stat(room, "light", 1)
+    #increment_stat(room, "light", 1)
 
 lantern = Thingy("lantern", "l",
         grab_lantern,
@@ -186,8 +185,8 @@ def apotheosis_action(player, room):
         You feel a tremendous energy coursing through you-
         the power of COZINESS!!!
 
-        Your coziness levels reached such a high level
-        that you have become a COZY DEMIGOD
+        Your coziness levels reach such a high level
+        that you become a COZY DEMIGOD
         """)
     increment_stat(player, "coziness", 998832419875)
     delete_action(apotheosis_action)

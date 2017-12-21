@@ -51,23 +51,27 @@ class Thingy(object):
         @Action(grab_name, grab_hotkey)
         def grab(player, room):
             grab_action(player, room)
+
+            deregister_action(room, grab)
+            for action in room_actions:
+                deregister_action(room, action)
+
             register_action(player, drop)
             for action in player_actions:
                 register_action(player, action)
-            deregister_action(room, grab)
-            for action in room_actions:
-                register_action(room, action)
         self.grab = grab
 
         @Action(drop_name, drop_hotkey)
         def drop(player, room):
             drop_action(player, room)
-            register_action(player, grab)
-            for action in room_actions:
-                register_action(room, action)
+
             deregister_action(player, drop)
             for action in player_actions:
-                register_action(player, action)
+                deregister_action(player, action)
+
+            register_action(room, grab)
+            for action in room_actions:
+                register_action(room, action)
         self.drop = drop
 
         def delete():
