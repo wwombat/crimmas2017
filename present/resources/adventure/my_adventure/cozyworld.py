@@ -112,9 +112,8 @@ tower = Room("The Tower", """
         A chest-height wall rings the tower's top, and looking out,
         you can see a snowy forest stretching into the distance.
 
-        In the summer, you think the garden must be truly beautiful-
-        you see a trellis where you remembered that morning glories 
-        would grow and open their faerie-blue trumpets, and a cluster 
+        In the summer, you think the garden must be really cozy-
+        you see a trellis perfect for morning glories and a cluster 
         of ornamental figs (now tightly wrapped in blankets) huddled 
         around a stone bench in the shape of a turtle.
         """,
