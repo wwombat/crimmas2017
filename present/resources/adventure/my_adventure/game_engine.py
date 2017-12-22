@@ -1,25 +1,54 @@
-from functools import wraps
+from inspect import signature
 
 #===================
 
 def make_owned_thing_helpers(name):
+    ''' Make a suite of functions used to register
+    named `things` in on an object under a member
+    dictionary identified by `name` using the
+    `hotkey` member of the passed thing.
+    '''
     def register(owner, thing):
-        if not hasattr(owner, name):
-            setattr(owner, name, {})
         getattr(owner, name)[thing.hotkey] = thing
         thing.parents += [owner]
     def deregister(owner, thing):
-        if hasattr(owner, name) and thing.hotkey in getattr(owner, name):
-            del getattr(owner, name)[thing.hotkey]
+        del getattr(owner, name)[thing.hotkey]
     def delete(thing):
         for parent in thing.parents:
             deregister(parent, thing)
-    return register, deregister, delete
+    def get(hotkey):
+        return getattr(owner, name)[hotkey]
+    def get_all(owner):
+        return getattr(owner, name)
+    return register, deregister, delete, get, get_all
 
 #===================
 
+def assertFunctionParamNames(func, name_list):
+    ''' Assert that the passed function `func`'s
+    parameters have the desired parameter names stored
+    in name_list
+    '''
+    paramError = TypeError("This class requires the "
+                        + "following parameters: {}".format(name_list))
+    sig = signature(func)
+    param_list = list(sig.parameters)
+    if len(param_list) != len(name_list):
+        raise paramError
+    for param, name in zip(param_list, name_list):
+        if (param != name):
+            raise paramError
+
 def Action(name, hotkey):
+    '''Action requires two arguments: name, which is the
+    name of the adventure action, and a hotkey, which is
+    a short convenience name for the given action.
+    '''
     def decorator(func):
+        ''' Func should accept two arguments:
+        `player`, a `Player` object and `room`, a `Room` object
+        '''
+        assertFunctionParamNames(func, ["player", "room"])
         func.name = name
         func.hotkey = hotkey
         func.parents = []
@@ -29,7 +58,9 @@ def Action(name, hotkey):
 
 register_action, \
 deregister_action, \
-delete_action = make_owned_thing_helpers("actions")
+delete_action, \
+get_action, \
+get_all_actions = make_owned_thing_helpers("actions")
 
 #===================
 
