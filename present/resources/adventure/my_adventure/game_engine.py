@@ -128,7 +128,8 @@ class World(object):
 
 #===================
 
-def noop(player):
+@Action("noop", "noop")
+def noop_action(player, room):
     pass
 
 def seq(functions):

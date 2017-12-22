@@ -91,16 +91,56 @@ class ActionTests(unittest.TestCase):
 
         # ACT
         delete_action(test_action_to_delete)
+        # ASSERT
         for obj in objs:
             self.assertEqual(len(get_all_actions(obj)), 1)
             self.assertTrue(get_all_actions(obj)["t"] is test_action)
 
+        # ACT
         delete_action(test_action)
+        # ASSERT
         for obj in objs:
             self.assertEqual(len(get_all_actions(obj)), 0)
 
 class ThingyTests(unittest.TestCase):
-    pass
+    def test_grabThingy_movesFromRoomToPlayer(self):
+        # ARRANGE
+        room = Bla()
+        player = Bla()
+        thingy = Thingy("test", "t", noop_action, noop_action)
+        register_action(room, thingy.grab)
+
+        self.assertEqual(len(get_all_actions(room)), 1)
+        self.assertTrue(get_all_actions(room)['g t'] is thingy.grab)
+        self.assertEqual(len(get_all_actions(player)), 0)
+
+        # ACT
+        thingy.grab(player, room)
+
+        # ASSERT
+        self.assertEqual(len(get_all_actions(room)), 0)
+        self.assertEqual(len(get_all_actions(player)), 1)
+        self.assertTrue(get_all_actions(player)['d t'] is thingy.drop)
+
+
+    def test_dropThingy_movesFromPlayerToRoom(self):
+        # ARRANGE
+        room = Bla()
+        player = Bla()
+        thingy = Thingy("test", "t", noop_action, noop_action)
+        register_action(player, thingy.drop)
+
+        self.assertEqual(len(get_all_actions(room)), 0)
+        self.assertEqual(len(get_all_actions(player)), 1)
+        self.assertTrue(get_all_actions(player)['d t'] is thingy.drop)
+
+        # ACT
+        thingy.drop(player, room)
+
+        # ASSERT
+        self.assertEqual(len(get_all_actions(room)), 1)
+        self.assertTrue(get_all_actions(room)['g t'] is thingy.grab)
+        self.assertEqual(len(get_all_actions(player)), 0)
 
 if __name__ == '__main__':
     unittest.main()
