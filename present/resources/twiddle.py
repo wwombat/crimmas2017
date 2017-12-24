@@ -11,7 +11,7 @@ def twiddle(secs):
         sys.stdout.write(frames[index])
         sys.stdout.flush()
         time.sleep(len_sleep)
-        sys.stdout.write('\x08')
-    print()
+        sys.stdout.write('\b')
 
-twiddle(3)
+if __name__ == "__main__":
+    twiddle(3)

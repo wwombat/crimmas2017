@@ -10,6 +10,7 @@ if [ ! $rc -eq 0 ]; then
 fi
 
 cd resources
+${PYTHON} load.py
 
 # Adventures must be performed in a clean environment
 env -i bash --noprofile --init-file <(echo "PYTHON=${PYTHON}; source ./present.cfg")
