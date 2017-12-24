@@ -102,8 +102,11 @@ lantern = Thingy("lantern", "l",
         [])
 register_action(den, lantern.grab)
 
-tower = Room("The Tower", """
-        You are in a small garden at the top of a tower.
+def tower_action(player):
+    if get_stat(player, "warmth") > 5:
+        print("""
+        Your coat and scarf keeps you warm-
+        the snow looks so fluffy and cozy!
 
         The entire garden is cloaked in snow- stone beasts sit,
         stoic, beneath coats of snow, next to bare-limbed trees.
@@ -115,26 +118,55 @@ tower = Room("The Tower", """
         In the summer, you think the garden must be really cozy-
         you see a trellis perfect for morning glories and a cluster 
         of ornamental figs (now tightly wrapped in blankets) huddled 
-        around a stone bench in the shape of a turtle.
-        """,
+        around a stone bench in the shape of a turtle.""")
+        increment_stat(player, "coziness", 5)
+        increment_stat(player, "wistfulness", 3)
+    else:
+        print("""
+        The chilly wind chills you...
+
+        You're so cold, you can't even see!!!
+        If only you had a means to stay warm...
+        """)
+        increment_stat(player, "coziness", -3)
+        increment_stat(player, "wistfulness", 3)
+
+tower = Room("The Tower", """
+        You are in a small garden at the top of a tower""",
         "you feel a cold wind blowing...",
-        seq([make_stat_incrementer("coziness", -3),
-             make_stat_incrementer("wistfulness", 3)]))
+        tower_action)
 
 kitchen = Room("Kitchen", """
         You see a small, but lovely kitchen, lit by a flickering
         candle and the dim blue-red glow of the oven's pilot
         light.
         """,
-        "a delicious scent wafts...",
+        "a warm light glows...",
         make_stat_incrementer("coziness", 2))
+
+@Action("Mix up flour, eggs, butter and sugar", "mix")
+def make_dough(player, room):
+    print("""
+        You whip up a batch of cookie dough""")
+    increment_stat(player, "coziness", 1)
+    deregister_action(kitchen, make_dough)
+    register_action(kitchen, bake_cookies)
+register_action(kitchen, make_dough)
+
+@Action("Bake cookies", "b")
+def bake_cookies(player, room):
+    print("""
+        You bake some delicious cookies""")
+    increment_stat(player, "coziness", 1)
+    deregister_action(kitchen, bake_cookies)
+    register_action(kitchen, cookies.grab)
+    register_action(kitchen, smell)
 
 @Action("Smell", "s")
 def smell(player, room):
     print("""
         Smells like crimmas ~^~""")
     increment_stat(player, "coziness", 1)
-register_action(kitchen, smell)
 
 @Action("Eat cookies", "eat")
 def eat(player, room):
@@ -143,7 +175,6 @@ def eat(player, room):
     increment_stat(player, "coziness", 1)
     increment_stat(player, "satiety", 1)
     cookies.delete()
-
 cookies = Thingy("cookies", "c",
         make_print_action("""
         You nab some delicious cookies."""),
@@ -151,11 +182,26 @@ cookies = Thingy("cookies", "c",
         You gently lay the sweet cookies down."""),
         [],
         [eat])
-register_action(kitchen, cookies.grab)
+
+hallway = Room("Hallway", """
+        A long, low hallway stretches in front of you.
+        There's plenty of room for dancing!
+        """,
+        "...",
+        noop)
+
+@Action("Dance", "s")
+def dance(player, room):
+    print("""
+        You do a little dance.""")
+    increment_stat(player, "coziness", 1)
+register_action(hallway, dance)
 
 # =====
 
-link_rooms(den, library, "Through an old wooden door", ("n", "s"),
+link_rooms(den, hallway, "Down a lonely hall", ("n", "s"),
+           "You pad down the hallway...")
+link_rooms(hallway, library, "Through an old wooden door", ("n", "s"),
            "You slip through the door...")
 link_rooms(foyer, den, "Through a wide arch", ("n", "s"),
            "You tip-toe through the arch...")

@@ -136,6 +136,9 @@ class World(object):
 
 #===================
 
+def noop(*args):
+    pass
+
 @Action("noop", "noop")
 def noop_action(player, room):
     pass
