@@ -8,17 +8,25 @@ def make_owned_thing_helpers(name):
     dictionary identified by `name` using the
     `hotkey` member of the passed thing.
     '''
+    def autovivify(owner):
+        ''' it's not my fault, if in God's plan... '''
+        if not hasattr(owner, name):
+            setattr(owner, name, {})
     def register(owner, thing):
+        autovivify(owner)
         getattr(owner, name)[thing.hotkey] = thing
         thing.parents += [owner]
     def deregister(owner, thing):
-        del getattr(owner, name)[thing.hotkey]
+        if hasattr(owner, name) and thing.hotkey in getattr(owner, name):
+            del getattr(owner, name)[thing.hotkey]
     def delete(thing):
         for parent in thing.parents:
             deregister(parent, thing)
     def get(hotkey):
+        autovivify(owner)
         return getattr(owner, name)[hotkey]
     def get_all(owner):
+        autovivify(owner)
         return getattr(owner, name)
     return register, deregister, delete, get, get_all
 

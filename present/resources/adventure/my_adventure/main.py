@@ -2,6 +2,7 @@
 ADVENTURE AWAITS
 """
 
+from game_engine import *
 import cozyworld
 import time
 
@@ -10,7 +11,7 @@ def game_eval(player, room, world):
     world.act(player)
     actions = []
     for thing in [room, player, world]:
-        actions += list(thing.actions.values())
+        actions += list(get_all_actions(thing).values())
     return actions
 
 def interactive_choose(actions):
