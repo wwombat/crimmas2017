@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Starts the adventure
+set -o errexit
+set -o nounset
 
 # Adventuring requires python3
 PYTHON=$(which python3)
