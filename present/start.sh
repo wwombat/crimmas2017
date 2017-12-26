@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Starts the adventure
 
 # Adventuring requires python3
