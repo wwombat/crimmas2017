@@ -4,10 +4,7 @@ set -o errexit
 set -o nounset
 
 # Adventuring requires python3
-PYTHON=$(which python3)
-
-rc=$?
-if [ ! $rc -eq 0 ]; then
+if ! PYTHON=$(which python3); then
     echo "error: python3 is needed for adventuring!"
     exit -1
 fi
